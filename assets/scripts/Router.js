@@ -24,6 +24,10 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    //this.addPage('home', homeFunc);
+    //this.navigate('home', false);
+    //console.log(window.location);
+    this['home'] = homeFunc;
   }
 
   /**
@@ -38,6 +42,7 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    this[page] = pageFunc;
   }
 
   /**
@@ -52,5 +57,33 @@ export class Router {
      * TODO Part 1
      * Fill in this function as specified in the comment above
      */
+    //history.pushState();
+    //console.log("before");
+    if (this[page] == null){
+      console.log('error');
+      return;
+    }
+    //console.log("after");
+    let hash;
+    if (page == 'home'){
+      hash = "";
+    }
+    else{
+      hash = '#' + page;
+    }
+    let obj = {"key": page};
+    //console.log(page);
+    //console.log(hash != window.location.hash);
+    //console.log(window.location.hash);
+    //console.log(!statePopped);
+    if (!statePopped && window.location.hash != hash){
+      //call pushstate
+      //console.log(obj);
+      history.pushState(obj, "", window.location.origin + hash);
+      //console.log(history);
+    }
+    //console.log(this[page]);
+    this[page]();
+    //window[this[page]]
   }
 }

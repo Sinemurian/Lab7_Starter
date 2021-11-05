@@ -22,6 +22,10 @@ const router = new Router(function () {
    * are removing any "shown" classes on <sections> you don't want to display, this home method should
    * be called more than just at the start. You should only really need two lines for this function.
    */
+  //const card = document.querySelector('section.section--recipe-cards');
+  document.querySelector('section.section--recipe-cards').classList.add("shown");
+  document.querySelector('section.section--recipe-expand').classList.remove("shown");
+  //console.log("WOOOOOOOOOOORRRRRRRRKKKKKKKK!!!!!!!!!!!!!!");
 });
 
 window.addEventListener('DOMContentLoaded', init);
@@ -45,8 +49,10 @@ async function init() {
   // Everything starts hidden so load the initial page.
   // This allows the page to be reloaded and maintain the current page, as well
   // as minimizes the amount of "page flashing" from the home --> new page
+  
   let page = window.location.hash.slice(1);
   if (page == '') page = 'home';
+  //window.location.hash='/'
   router.navigate(page);
 }
 
@@ -95,6 +101,23 @@ function createRecipeCards() {
   for (let i = 0; i < recipes.length; i++) {
     const recipeCard = document.createElement('recipe-card');
     recipeCard.data = recipeData[recipes[i]];
+     // Makes a new recipe card
+
+    // This gets the page name of each of the arrays - which is basically
+    // just the filename minus the .json. Since this is the first element
+    // in our recipes array, the ghostCookies URL, we will receive the .json
+    // for that ghostCookies URL since it's a key in the recipeData object, and
+    // then we'll grab the 'page-name' from it - in this case it will be 'ghostCookies'
+    const page = recipeData[recipes[i]]['page-name'];
+    router.addPage(page, function() {
+      document.querySelector('.section--recipe-cards').classList.remove('shown');
+      document.querySelector('.section--recipe-expand').classList.add('shown');
+      document.querySelector('recipe-expand').data = recipeData[recipes[i]];
+    });
+    bindRecipeCard(recipeCard, page);
+
+    document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
+
     /**
      * TODO - Part 1
      * Create the new routes for each card with .addPage(), use bindRecipeCard()
@@ -154,6 +177,10 @@ function bindRecipeCard(recipeCard, pageName) {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+   recipeCard.addEventListener('click', e => {
+    if (e.path[0].nodeName == 'A') return;
+    router.navigate(pageName);
+  });
 }
 
 /**
@@ -165,6 +192,10 @@ function bindEscKey() {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+   document.addEventListener("keydown", esc => {
+     router.navigate('home', false);
+   });
+
 }
 
 /**
@@ -179,4 +210,20 @@ function bindPopstate() {
    * TODO - Part 1
    * Fill in this function as specified in the comment above
    */
+  window.addEventListener("popstate", function(event) {
+    //console.log(event);
+    console.log(event);
+    //console.log(history);
+    //console.log(window.history);
+    if (event.state != null){
+      //history.pushState();
+      router.navigate(event.state.key);
+      //router.navigate(history[history.length - 1]);
+      //router.navigate(history.back);
+      //history.back();
+    }
+    else{
+      router.navigate('home', true);
+    }
+  });
 }
